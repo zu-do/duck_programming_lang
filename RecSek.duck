@@ -1,14 +1,12 @@
 VAR n=10
-
+VAR d = []
 FUN REC(n)
 	IF n <= 1 THEN RETURN n
 	RETURN REC(n-1) + REC(n-2)
 END
-
 FOR i = 1 TO n THEN
 	  PRINT(REC(i))
-      #PRINTTOFILE(REC(i), "failas.txt")
+	  d + REC(i)
 END
-VAR d = REC(10)
-PRINTTOFILE("LAbs", "failas.txt")
+PRINTTOFILE(d, "recurSeka.txt")
 
