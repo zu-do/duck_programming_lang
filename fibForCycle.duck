@@ -1,0 +1,20 @@
+FUN FibF(n)
+    VAR a = 0
+    VAR b = 1
+    VAR c = 0
+
+    IF n == 0 THEN RETURN a
+
+    FOR i = 1 TO n THEN
+        VAR c = a + b
+        VAR a = b
+        VAR b = c
+        PRINT(c)
+    END
+
+    RETURN b
+END
+
+VAR rez = FibF(9)
+PRINT("Atsakymas panaudojus for cikla:")
+PRINT(rez)
