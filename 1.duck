@@ -1,0 +1,3 @@
+ VAR b = FALSE  
+
+ NIF(b) THEN PRINT_RET([1,2,3,4]/1) ELSE PRINT(7) 
