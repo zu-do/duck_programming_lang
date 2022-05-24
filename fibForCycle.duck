@@ -1,3 +1,4 @@
+VAR d = []
 FUN FibF(n)
     VAR a = 0
     VAR b = 1
@@ -9,6 +10,7 @@ FUN FibF(n)
         VAR c = a + b
         VAR a = b
         VAR b = c
+        d+c
         PRINT(c)
     END
 
@@ -18,3 +20,4 @@ END
 VAR rez = FibF(9)
 PRINT("Atsakymas panaudojus for cikla:")
 PRINT(rez)
+PRINTTOFILE(d, "RezForSeka.txt")
