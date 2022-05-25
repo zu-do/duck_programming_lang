@@ -1667,26 +1667,17 @@ class List(Value):
  
   def powed_by(self, other):
     if isinstance(other, List):
-      
+          
       new_list = self.copy()
       try:
         a = other.elements[0]
-        #print(a)
-        b=other.elements[1]
-
-        #print(self.elements[a.value])
-        #print(self.elements[b.value])
-        i=0
-        #print(new_list)
+        b = other.elements[1]
         length=len(self.elements)-1 # ilgis pradinio masyvo
-        
-        for i in range(length):
-          #print(i)
-          if(i==length):
-            break
+      
+        for i in range(length, -1, -1):
           if(i<a.value or i>b.value):
             new_list.elements.pop(i) #jei i ne a-b rezi elementa istrina
-          
+                
         return new_list, None
       except:
         return None, RTError(
@@ -1704,7 +1695,7 @@ class List(Value):
     return copy
 
   def copyy(self):
-    copy = []
+    copy = List()
     copy.set_pos(self.pos_start, self.pos_end)
     copy.set_context(self.context)
     return copy
@@ -2345,10 +2336,10 @@ global_symbol_table.set("RUN", BuiltInFunction.run)
 def run(fn, text):
   # Generate tokens
   lexer = Lexer(fn, text)
-  #print(lexer)
+ 
   tokens, error = lexer.make_tokens()
   if error: return None, error
-  print(tokens)
+  
   # Generate AST
   parser = Parser(tokens)
   ast = parser.parse()
