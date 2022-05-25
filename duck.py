@@ -108,6 +108,8 @@ TT_MUL      	= 'MUL'
 TT_DIV      	= 'DIV'
 TT_POW				= 'POW'
 TT_EQ					= 'EQ'
+TT_DOT        = 'DOT'
+TT_DOTDOT     = 'DOTDOT'
 TT_LPAREN   	= 'LPAREN'
 TT_RPAREN   	= 'RPAREN'
 TT_LSQUARE    = 'LSQUARE'
@@ -233,6 +235,8 @@ class Lexer:
         tokens.append(self.make_less_than())
       elif self.current_char == '>':
         tokens.append(self.make_greater_than())
+      elif self.current_char == ':':
+          tokens.append(self.make_two_dots())
       elif self.current_char == ',':
         tokens.append(Token(TT_COMMA, pos_start=self.pos))
         self.advance()
@@ -352,7 +356,17 @@ class Lexer:
       tok_type = TT_GTE
 
     return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
+  
+  def make_two_dots(self):
+    tok_type = TT_DOT
+    pos_start = self.pos.copy()
+    self.advance()
 
+    if self.current_char == ':':
+      self.advance()
+      tok_type = TT_DOTDOT
+
+    return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
   def skip_comment(self):
     self.advance()
 
@@ -1400,6 +1414,9 @@ class Value:
 
   def added_to(self, other):
     return None, self.illegal_operation(other)
+  
+  def by_id(self, other):
+    return None, self.illegal_operation(other)
 
   def subbed_by(self, other):
     return None, self.illegal_operation(other)
@@ -1654,9 +1671,47 @@ class List(Value):
         )
     else:
       return None, Value.illegal_operation(self, other)
-  
+ 
+  def powed_by(self, other):
+    if isinstance(other, List):
+      
+      new_list = self.copy()
+      try:
+        a = other.elements[0]
+        #print(a)
+        b=other.elements[1]
+
+        #print(self.elements[a.value])
+        #print(self.elements[b.value])
+        i=0
+        #print(new_list)
+        length=len(self.elements)-1 # ilgis pradinio masyvo
+        
+        for i in range(length):
+          #print(i)
+          if(i==length):
+            break
+          if(i<a.value or i>b.value):
+            new_list.elements.pop(i) #jei i ne a-b rezi elementa istrina
+          
+        return new_list, None
+      except:
+        return None, RTError(
+          other.pos_start, other.pos_end,
+          'Element at this index could not be removed from list because index is out of bounds',
+          self.context
+        )
+    else:
+      return None, Value.illegal_operation(self, other)
+
   def copy(self):
     copy = List(self.elements)
+    copy.set_pos(self.pos_start, self.pos_end)
+    copy.set_context(self.context)
+    return copy
+
+  def copyy(self):
+    copy = []
     copy.set_pos(self.pos_start, self.pos_end)
     copy.set_context(self.context)
     return copy
@@ -2070,6 +2125,8 @@ class Interpreter:
       result, error = left.dived_by(right)
     elif node.op_tok.type == TT_POW:
       result, error = left.powed_by(right)
+    elif node.op_tok.type == TT_DOT:
+      result, error = left.by_id(right)
     elif node.op_tok.type == TT_EE:
       result, error = left.get_comparison_eq(right)
     elif node.op_tok.type == TT_NE:
@@ -2303,9 +2360,10 @@ global_symbol_table.set("RUN", BuiltInFunction.run)
 def run(fn, text):
   # Generate tokens
   lexer = Lexer(fn, text)
+  #print(lexer)
   tokens, error = lexer.make_tokens()
   if error: return None, error
-  
+  print(tokens)
   # Generate AST
   parser = Parser(tokens)
   ast = parser.parse()

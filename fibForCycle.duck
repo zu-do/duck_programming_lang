@@ -21,3 +21,4 @@ VAR rez = FibF(9)
 PRINT("Atsakymas panaudojus for cikla:")
 PRINT(rez)
 PRINTTOFILE(d, "RezForSeka.txt")
+
