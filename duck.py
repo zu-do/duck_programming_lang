@@ -1557,7 +1557,10 @@ class Number(Value):
     return copy
 
   def is_true(self):
-    return self.value != 0
+    return self.value != 0 and self.value != -1
+
+  def is_maybe(self):
+    return self.value != 1
 
   def __str__(self):
     return str(self.value)
@@ -1568,6 +1571,7 @@ class Number(Value):
 Number.null = Number(0)
 Number.false = Number(0)
 Number.true = Number(1)
+Number.maybe = Number(-1)
 Number.math_PI = Number(math.pi)
 
 class String(Value):
@@ -1589,6 +1593,9 @@ class String(Value):
 
   def is_true(self):
     return len(self.value) > 0
+
+  def is_maybe(self):
+        return len(self.value) <= 0
 
   def copy(self):
     copy = String(self.value)
@@ -1857,7 +1864,7 @@ class BuiltInFunction(BaseFunction):
       ))
 
     try:
-      element = list_.elements.pop(index.value)
+      element = list_.elements.pop(index.value) 
     except:
       return RTResult().failure(RTError(
         self.pos_start, self.pos_end,
@@ -2121,6 +2128,7 @@ class Interpreter:
 
         return res.success(None)
 
+
   def visit_IfNode(self, node, context):
     res = RTResult()
 
@@ -2128,12 +2136,19 @@ class Interpreter:
       condition_value = res.register(self.visit(condition, context))
       if res.should_return(): return res
 
+      if condition_value.is_maybe():
+        expr_value = res.register(self.visit(expr, context))
+        if res.should_return(): return res
+        
+        return res.success(Number.null if should_return_null else expr_value)
+
       if condition_value.is_true():
         expr_value = res.register(self.visit(expr, context))
         if res.should_return(): return res
         return res.success(Number.null if should_return_null else expr_value)
 
     if node.else_case:
+      
       expr, should_return_null = node.else_case
       expr_value = res.register(self.visit(expr, context))
       if res.should_return(): return res
@@ -2266,7 +2281,7 @@ global_symbol_table = SymbolTable()
 global_symbol_table.set("NULL", Number.null)
 global_symbol_table.set("FALSE", Number.false)
 global_symbol_table.set("TRUE", Number.true)
-global_symbol_table.set("MAYBE", Number(2))
+global_symbol_table.set("MAYBE", Number(-1))
 global_symbol_table.set("MATH_PI", Number.math_PI)
 global_symbol_table.set("PRINT", BuiltInFunction.print)
 global_symbol_table.set("PRINTTOFILE", BuiltInFunction.printtofile)

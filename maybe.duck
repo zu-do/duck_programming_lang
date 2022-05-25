@@ -1,0 +1,3 @@
+VAR a = MAYBE
+
+IF(a) THEN PRINT("veikia su maybe") ELSE PRINT("irgi ieina")
