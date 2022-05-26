@@ -744,12 +744,14 @@ class Parser:
       factor = res.register(self.factor())
       if res.error: return res
       return res.success(UnaryOpNode(tok, factor))
-
+    if tok.type == TT_DOT:
+      return self.dotdot()
     return self.power()
 
   def power(self):
     return self.bin_op(self.call, (TT_POW, ), self.factor)
-
+  def dotdot(self):
+    return self.bin_op(self.call, (TT_DOT, ), self.factor)
   def call(self):
     res = ParseResult()
     atom = res.register(self.atom())
@@ -1665,6 +1667,36 @@ class List(Value):
     else:
       return None, Value.illegal_operation(self, other)
  
+  def get_comparison_gt(self, other):
+    if isinstance(other, String):
+     new_list = self.copy()
+     try:
+      max=0;
+      length1=len(new_list.elements) # ilgis naujo masyvo
+        
+      for i in range(length1):
+        
+        g=new_list.elements[i]
+        if(g.value>max):
+          max=new_list.elements[i]
+          max=max.value
+
+      for i in range(length1-1, 0, -1):
+        new_list.elements.pop(i)
+      
+      new_list.elements.append(max)
+      new_list.elements.pop(0)
+        
+      return new_list, None
+     except:
+        return None, RTError(
+          other.pos_start, other.pos_end,
+          'Element at this index could not be reached in this list because index is out of bounds',
+          self.context
+        )
+    else:
+      return None, Value.illegal_operation(self, other)
+
   def powed_by(self, other):
     if isinstance(other, List):
           
@@ -1677,12 +1709,13 @@ class List(Value):
         for i in range(length, -1, -1):
           if(i<a.value or i>b.value):
             new_list.elements.pop(i) #jei i ne a-b rezi elementa istrina
-                
+        
+                   
         return new_list, None
       except:
         return None, RTError(
           other.pos_start, other.pos_end,
-          'Element at this index could not be removed from list because index is out of bounds',
+          'Element at this index could not be reached in this list because index is out of bounds',
           self.context
         )
     else:
@@ -1690,12 +1723,6 @@ class List(Value):
 
   def copy(self):
     copy = List(self.elements)
-    copy.set_pos(self.pos_start, self.pos_end)
-    copy.set_context(self.context)
-    return copy
-
-  def copyy(self):
-    copy = List()
     copy.set_pos(self.pos_start, self.pos_end)
     copy.set_context(self.context)
     return copy
