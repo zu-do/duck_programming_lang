@@ -1,0 +1,4 @@
+VAR L = [1,2,3,4,5,6]
+VAR D = L ^ [2,5]
+VAR R = D>"MAX"
+PRINT(R)
