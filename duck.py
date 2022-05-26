@@ -1730,31 +1730,38 @@ class List(Value):
 
     def get_comparison_gt(self, other):
         if isinstance(other, String):
-            new_list = self.copy()
+            if(other.value=="MAX"):
+             new_list = self.copy()
+            else: 
+              return None, RTError(
+                      other.pos_start, other.pos_end,
+                      'WRONG STRING, MAYBE YOU MEANT "MAX"',
+                      self.context
+                  )
             try:
-                max = 0;
-                length1 = len(new_list.elements)  # ilgis naujo masyvo
+                  max = 0;
+                  length1 = len(new_list.elements)  # ilgis naujo masyvo
 
-                for i in range(length1):
+                  for i in range(length1):
 
-                    g = new_list.elements[i]
-                    if (g.value > max):
-                        max = new_list.elements[i]
-                        max = max.value
+                      g = new_list.elements[i]
+                      if (g.value > max):
+                          max = new_list.elements[i]
+                          max = max.value
 
-                for i in range(length1 - 1, 0, -1):
-                    new_list.elements.pop(i)
+                  for i in range(length1 - 1, 0, -1):
+                      new_list.elements.pop(i)
 
-                new_list.elements.append(max)
-                new_list.elements.pop(0)
+                  new_list.elements.append(max)
+                  new_list.elements.pop(0)
 
-                return new_list, None
+                  return new_list, None
             except:
-                return None, RTError(
-                    other.pos_start, other.pos_end,
-                    'Element at this index could not be reached in this list because index is out of bounds',
-                    self.context
-                )
+                  return None, RTError(
+                      other.pos_start, other.pos_end,
+                      'Element at this index could not be reached in this list because index is out of bounds',
+                      self.context
+                  )
         else:
             return None, Value.illegal_operation(self, other)
 
