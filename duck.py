@@ -1773,6 +1773,17 @@ class List(Value):
                 a = other.elements[0]
                 b = other.elements[1]
                 length = len(self.elements) - 1  # ilgis pradinio masyvo
+                # while(i<=length):
+                #     if(i<a.value):
+                #       new_list.elements.pop(i)
+                #       a.value = a.value-1  
+                #       b.value = b.value-1 
+                #       length = length-1
+                #     elif(i>b.value):
+                #       new_list.elements.pop(i) 
+                #       length = length-1
+                #     else:
+                #         i=i+1
 
                 for i in range(length, -1, -1):
                     if (i < a.value or i > b.value):
